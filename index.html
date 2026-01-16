@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
   <head>
@@ -19,6 +20,7 @@
               emerald: {
                 400: '#34d399',
                 500: '#10b981',
+                600: '#059669',
                 900: '#064e3b',
               },
               violet: {
@@ -28,12 +30,19 @@
               },
               gray: {
                 800: '#1f2937',
-                900: '#111827',
-                950: '#030712',
+                900: '#0a0a0f',
+                950: '#030303',
               }
             },
             animation: {
               'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'shimmer': 'shimmer 2s linear infinite',
+            },
+            keyframes: {
+              shimmer: {
+                '0%': { backgroundPosition: '-200% 0' },
+                '100%': { backgroundPosition: '200% 0' },
+              }
             }
           }
         }
@@ -41,13 +50,34 @@
     </script>
     <style>
       body {
-        background-color: #030712;
+        background-color: #030303;
         color: #f3f4f6;
+        -webkit-font-smoothing: antialiased;
       }
-      /* Hide scrollbar for clean UI */
+      /* Hide scrollbar */
       ::-webkit-scrollbar {
         width: 0px;
         background: transparent;
+      }
+      .glass-shine {
+        position: relative;
+        overflow: hidden;
+      }
+      .glass-shine::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.03),
+          transparent
+        );
+        transform: rotate(45deg);
+        pointer-events: none;
       }
     </style>
   <script type="importmap">

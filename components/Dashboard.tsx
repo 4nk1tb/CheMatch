@@ -1,6 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { RefreshCw, Search, Menu, MessageSquareText, MapPin, Globe } from 'lucide-react';
+import { RefreshCw, Menu, MessageSquareText, MapPin, Globe, Sparkles } from 'lucide-react';
 import { SwipeCard } from './SwipeCard';
 import { MatchModal } from './MatchModal';
 import { MobileMenu } from './MobileMenu';
@@ -18,12 +19,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userCountry }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isInboxOpen, setIsInboxOpen] = useState(false);
 
-  // Initialize and Sort Cards based on User Country
   useEffect(() => {
     let sortedItems = [...MOCK_WASTE_ITEMS];
-    
     if (userCountry && userCountry !== 'Otro / Global') {
-      // Prioritize items that match the user's country in their location string
       sortedItems = sortedItems.sort((a, b) => {
         const aIsLocal = a.location.includes(userCountry);
         const bIsLocal = b.location.includes(userCountry);
@@ -40,139 +38,102 @@ export const Dashboard: React.FC<DashboardProps> = ({ userCountry }) => {
 
   const handleSwipe = (direction: 'left' | 'right') => {
     const swipedCard = cards[0];
-    
-    // Remove card from stack
     setCards(current => current.slice(1));
-
     if (direction === 'right') {
-      // Trigger Match Modal
       setLastMatchedItem(swipedCard);
     }
   };
 
-  const resetCards = () => {
-    setCards(MOCK_WASTE_ITEMS);
-  };
-
   return (
-    <div className="min-h-screen bg-black text-white overflow-hidden flex flex-col">
-      {/* Mobile Menu Overlay (Left) */}
+    <div className="min-h-screen bg-black text-white overflow-hidden flex flex-col font-sans">
       <MobileMenu isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
-      
-      {/* Inbox Panel Overlay (Right) */}
       <InboxPanel isOpen={isInboxOpen} onClose={() => setIsInboxOpen(false)} />
 
-      {/* Top Navigation */}
-      <header className="px-6 pt-4 pb-2 flex items-center justify-between z-20 bg-gradient-to-b from-black/90 to-transparent">
+      <header className="px-6 py-6 flex items-center justify-between z-30 bg-black/50 backdrop-blur-lg border-b border-white/5">
         <button 
           onClick={() => setIsMenuOpen(true)}
-          className="p-2 -ml-2 rounded-full hover:bg-white/10 transition-colors"
+          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
         >
-          <Menu className="w-6 h-6 text-gray-400" />
+          <Menu className="w-5 h-5 text-gray-400" />
         </button>
         
-        <div className="flex flex-col items-center">
-          <h1 className="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-violet-400">
-            ChemMatch
-          </h1>
-          {/* Country Indicator */}
-          <div className="flex items-center gap-1 mt-1">
-             <MapPin className="w-3 h-3 text-emerald-500" />
-             <span className="text-[10px] uppercase font-bold text-gray-400 tracking-wider">
-               Base: {userCountry}
-             </span>
+        <div className="text-center">
+          <div className="flex items-center justify-center gap-1.5">
+            <Sparkles className="w-4 h-4 text-emerald-400" />
+            <h1 className="text-lg font-black tracking-tighter uppercase italic">ChemMatch</h1>
+          </div>
+          <div className="flex items-center justify-center gap-1 opacity-50">
+             <MapPin className="w-2.5 h-2.5" />
+             <span className="text-[9px] font-black uppercase tracking-widest">{userCountry} Hub</span>
           </div>
         </div>
         
         <button 
           onClick={() => setIsInboxOpen(true)}
-          className="relative p-2 -mr-2 rounded-full hover:bg-white/10 transition-colors group"
+          className="relative w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
         >
-          <MessageSquareText className="w-6 h-6 text-gray-400 group-hover:text-white transition-colors" />
-          {/* Notification Dot */}
-          <span className="absolute top-2 right-1.5 flex h-2.5 w-2.5">
+          <MessageSquareText className="w-5 h-5 text-gray-400" />
+          <span className="absolute -top-1 -right-1 flex h-3 w-3">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 border border-black"></span>
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-black"></span>
           </span>
         </button>
       </header>
 
-      {/* Main Card Area */}
-      <div className="flex-1 flex flex-col items-center justify-center relative w-full max-w-lg mx-auto px-4 pb-12">
-        <div className="w-full h-[600px] relative">
+      <main className="flex-1 flex flex-col items-center justify-center relative w-full max-w-lg mx-auto px-4 pb-20">
+        <div className="w-full h-[620px] relative">
           <AnimatePresence>
             {cards.length > 0 ? (
               <>
-                {/* Background Card (Next in stack) */}
-                {nextCard && (
-                  <SwipeCard 
-                    key={nextCard.id} 
-                    item={nextCard} 
-                    isFront={false} 
-                    onSwipe={() => {}} 
-                  />
-                )}
-                
-                {/* Foreground Card (Active) */}
-                <SwipeCard 
-                  key={activeCard.id} 
-                  item={activeCard} 
-                  isFront={true} 
-                  onSwipe={handleSwipe} 
-                />
+                {nextCard && <SwipeCard key={nextCard.id} item={nextCard} isFront={false} onSwipe={() => {}} />}
+                <SwipeCard key={activeCard.id} item={activeCard} isFront={true} onSwipe={handleSwipe} />
               </>
             ) : (
-              // Empty State
               <motion.div 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-full h-full flex flex-col items-center justify-center text-center p-8 border border-white/10 rounded-3xl bg-white/5 backdrop-blur-md"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full h-full flex flex-col items-center justify-center text-center p-12 border border-white/10 rounded-[3rem] bg-gray-900/40 backdrop-blur-md shadow-2xl"
               >
-                <div className="w-20 h-20 bg-emerald-900/30 rounded-full flex items-center justify-center mb-6">
-                  <Globe className="w-10 h-10 text-emerald-500" />
+                <div className="w-24 h-24 bg-emerald-500/10 rounded-full flex items-center justify-center mb-8 border border-emerald-500/20">
+                  <Globe className="w-12 h-12 text-emerald-500" />
                 </div>
-                <h3 className="text-2xl font-bold text-white mb-2">Búsqueda Global Completada</h3>
-                <p className="text-gray-400 mb-8 max-w-xs mx-auto">
-                  Has revisado todas las oportunidades logísticamente viables para {userCountry} hoy.
+                <h3 className="text-3xl font-black text-white mb-4 tracking-tight">Fin del Inventario</h3>
+                <p className="text-gray-500 mb-10 text-sm leading-relaxed font-medium">
+                  Has revisado todos los subproductos industriales disponibles para el nodo <span className="text-emerald-400">{userCountry}</span>.
                 </p>
                 <button 
-                  onClick={resetCards}
-                  className="flex items-center gap-2 px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-full font-semibold transition-colors"
+                  onClick={() => setCards(MOCK_WASTE_ITEMS)}
+                  className="flex items-center gap-3 px-8 py-4 bg-white text-black rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 transition-transform"
                 >
-                  <RefreshCw className="w-4 h-4" />
-                  Expandir Radio
+                  <RefreshCw className="w-4 h-4" /> Resetear Radio
                 </button>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
 
-        {/* Controls (Visual Only for this demo, functionality is in swipe) */}
         {cards.length > 0 && (
-          <div className="flex items-center gap-6 mt-8 z-20">
+          <div className="flex items-center gap-10 mt-12 z-20">
             <button 
               onClick={() => handleSwipe('left')}
-              className="w-16 h-16 rounded-full bg-gray-900/80 border border-red-500/50 text-red-500 flex items-center justify-center hover:scale-110 hover:bg-red-500/20 transition-all duration-200 shadow-lg shadow-red-900/20"
+              className="w-20 h-20 rounded-full bg-gray-900 border-2 border-white/5 flex items-center justify-center text-red-500 hover:scale-110 active:scale-95 transition-all shadow-xl group"
               aria-label="Reject"
             >
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="group-hover:rotate-12 transition-transform"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
             </button>
             
             <button 
               onClick={() => handleSwipe('right')}
-              className="w-20 h-20 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:scale-110 hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all duration-200 shadow-xl"
+              className="w-24 h-24 rounded-full bg-emerald-500 text-white flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-2xl shadow-emerald-500/20 group"
               aria-label="Match"
             >
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="group-hover:scale-110 transition-transform"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
             </button>
           </div>
         )}
-      </div>
+      </main>
 
-      <MatchModal 
-        item={lastMatchedItem} 
-        onClose={() => setLastMatchedItem(null)} 
-      />
+      <MatchModal item={lastMatchedItem} onClose={() => setLastMatchedItem(null)} />
     </div>
   );
 };
