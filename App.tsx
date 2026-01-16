@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { LandingPage } from './components/LandingPage';
 import { CountrySelector } from './components/CountrySelector';
@@ -15,7 +16,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="font-sans antialiased text-gray-100 min-h-screen bg-gray-950">
+    <div className="font-sans antialiased text-gray-100 min-h-screen bg-black">
       {view === 'landing' && (
         <LandingPage onStart={() => setView('country-select')} />
       )}
